@@ -1039,9 +1039,9 @@ $(document).on("change", ".discount", function () {
         leftOrRightVal = smv.getMovableContainerCssLeftVal();
         leftVal = smv.getMovableContainerLeftVal()
 
-        console.log(leftVal)
-        console.log(minPos)
-        console.log(minPos === leftVal)
+        // console.log(leftVal)
+        // console.log(minPos)
+        // console.log(minPos === leftVal)
         
         smv.performingSlideAnim = true;
 
