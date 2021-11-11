@@ -332,6 +332,7 @@ $(document).on("change", ".discount", function () {
     
     // ElementsHandler prototype methods
     (function (p) {
+
         p.initElements = function (options) {
           var ehd = this;
     
@@ -512,7 +513,7 @@ $(document).on("change", ".discount", function () {
               stc = ehd.stc;
     
           stc.winWidth = stc.$win.width();
-          stc.scrollArrowsCombinedWidth = stc.$slideLeftArrow.outerWidth() + stc.$slideRightArrow.outerWidth();
+          stc.scrollArrowsCombinedWidth = 1;
     
           ehd.setFixedContainerWidth();
           ehd.setMovableContainerWidth();
@@ -596,7 +597,6 @@ $(document).on("change", ".discount", function () {
            */
           stc.fixedContainerWidth = tabsContainerRect.width || (tabsContainerRect.right - tabsContainerRect.left);
           stc.fixedContainerWidth = stc.fixedContainerWidth * stc.widthMultiplier;
-    
           stc.$fixedContainer.width(stc.fixedContainerWidth);
         };
     
@@ -627,11 +627,11 @@ $(document).on("change", ".discount", function () {
               var $li = $(this),
                   totalMargin = 0;
     
-              if (stc.isNavPills) { // pills have a margin-left, tabs have no margin
-                totalMargin = parseInt($li.css('margin-left'), 10) + parseInt($li.css('margin-right'), 10);
-              }
+              // if (stc.isNavPills) { // pills have a margin-left, tabs have no margin
+              //   totalMargin = parseInt($li.css('margin-left'), 10) + parseInt($li.css('margin-right'), 10);
+              // }
     
-              stc.movableContainerWidth += ($li.outerWidth() + totalMargin);
+              stc.movableContainerWidth += ($li.outerWidth() + 0);
             });
     
             stc.movableContainerWidth += 1;
@@ -857,6 +857,12 @@ $(document).on("change", ".discount", function () {
     
         return (stc.movableContainerLeftPos === 0) ? '0' : stc.movableContainerLeftPos + 'px';
       };
+      p.getMovableContainerLeftVal = function () {
+        var smv = this,
+            stc = smv.stc;
+    
+        return (stc.movableContainerLeftPos === 0) ? '0' : stc.movableContainerLeftPos;
+      };
     
       p.incrementMovableContainerLeft = function () {
         var smv = this,
@@ -1020,7 +1026,8 @@ $(document).on("change", ".discount", function () {
         var smv = this,
             stc = smv.stc,
             minPos = smv.getMinPos(),
-            leftOrRightVal;
+            leftOrRightVal,
+            leftVal;
     
         if (stc.movableContainerLeftPos > 0) {
           stc.movableContainerLeftPos = 0;
@@ -1030,12 +1037,21 @@ $(document).on("change", ".discount", function () {
     
         stc.movableContainerLeftPos = stc.movableContainerLeftPos / 1;
         leftOrRightVal = smv.getMovableContainerCssLeftVal();
-    
+        leftVal = smv.getMovableContainerLeftVal()
+
+        console.log(leftVal)
+        console.log(minPos)
+        console.log(minPos === leftVal)
+        
         smv.performingSlideAnim = true;
-    
-        stc.$movableContainer.css({
-          transform: 'translateX(' + leftOrRightVal + ')'
-        });
+
+        // if(leftVal === minPos) {
+        //   return
+        // } else {
+          stc.$movableContainer.css({
+            transform: 'translateX(' + leftOrRightVal + ')'
+          });
+        // }
     
         stc.$movableContainer.on('transitionend.scrtabs', function() {
           stc.$movableContainer.off('transitionend.scrtabs');
@@ -1211,7 +1227,7 @@ $(document).on("change", ".discount", function () {
       }
     
       function getTabAnchorHtml() {
-        return '<a class="nav-link" role="tab" data-toggle="tab"></a>';
+        // return '<a class="nav-link" role="tab" data-toggle="tab"></a>';
       }
     
       function getNewElTabAnchor(tab, propNames) {
@@ -1993,4 +2009,31 @@ $(document).on("change", ".discount", function () {
       });
     }
   }(jQuery));
-  
+
+const slider = document.querySelector('.scrtabs-tab-container');
+let isDown = false;
+let startX;
+let scrollLeft;
+
+slider.addEventListener('mousedown', (e) => {
+  isDown = true;
+  slider.classList.add('activate');
+  startX = e.pageX - slider.offsetLeft;
+  scrollLeft = slider.scrollLeft;
+});
+slider.addEventListener('mouseleave', () => {
+  isDown = false;
+  slider.classList.remove('active');
+});
+slider.addEventListener('mouseup', () => {
+  isDown = false;
+  slider.classList.remove('active');
+});
+slider.addEventListener('mousemove', (e) => {
+  if(!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - slider.offsetLeft;
+  const walk = (x - startX) * 3; //scroll-fast
+  slider.scrollLeft = scrollLeft - walk;
+  console.log(walk);
+});
